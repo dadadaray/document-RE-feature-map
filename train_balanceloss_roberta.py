@@ -14,14 +14,9 @@ from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from model_balanceloss import DocREModel
 from utils_sample import set_seed, collate_fn
 from evaluation import to_official, official_evaluate
-from preprocdr import ReadDataset
+from prepro import ReadDataset
 
-<<<<<<< HEAD
-def count_parameters(model):
-    return sum(p.numel() for p in model.parameters() if p.requires_grad)
-=======
 
->>>>>>> dd6e4e7 (First commit)
 
 def train(args, model, train_features, dev_features, test_features):
     def logging(s, print_=True, log_=True):
@@ -181,14 +176,10 @@ def evaluate(args, model, features, tag="dev"):
     ans = to_official(preds, features)
     if len(ans) > 0:
         if tag=="dev":
-            path="dev_filter.json"
+            path="dev.json"
         if tag=="test":
-            path = "test_filter.json"
-<<<<<<< HEAD
+            path = "test.json"
         best_f1, _, best_f1_ign, _, re_p, re_r = official_evaluate(ans, args.data_dir,"train_annotated.json",path)
-=======
-        best_f1, _, best_f1_ign, _, re_p, re_r = official_evaluate(ans, args.data_dir,"train_filter.json",path)
->>>>>>> dd6e4e7 (First commit)
     output = {
         tag + "_F1": best_f1 * 100,
         tag + "_F1_ign": best_f1_ign * 100,
@@ -227,13 +218,13 @@ def main():
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--data_dir", default="./dataset/cdr_zhuanhuan/output", type=str)
+    parser.add_argument("--data_dir", default="./dataset/Re-DocRED", type=str)
     parser.add_argument("--transformer_type", default="bert", type=str)
-    parser.add_argument("--model_name_or_path", default="bert-base-cased", type=str)
+    parser.add_argument("--model_name_or_path", default="roberta-base", type=str)
 
-    parser.add_argument("--train_file", default="train_filter.json", type=str)
-    parser.add_argument("--dev_file", default="dev_filter.json", type=str)
-    parser.add_argument("--test_file", default="test_filter.json", type=str)
+    parser.add_argument("--train_file", default="train_annotated.json", type=str)
+    parser.add_argument("--dev_file", default="dev.json", type=str)
+    parser.add_argument("--test_file", default="test.json", type=str)
     parser.add_argument("--save_path", default="", type=str)
     parser.add_argument("--load_path", default="", type=str)
     parser.add_argument("--weight_decay", type=float, default='0.0001',
@@ -253,11 +244,7 @@ def main():
                         help="Batch size for testing.")
     parser.add_argument("--gradient_accumulation_steps", default=1, type=int,
                         help="Number of updates steps to accumulate before performing a backward/update pass.")
-<<<<<<< HEAD
     parser.add_argument("--num_labels", default=4, type=int,
-=======
-    parser.add_argument("--num_labels", default=1, type=int,
->>>>>>> dd6e4e7 (First commit)
                         help="Max number of labels in prediction.")
     parser.add_argument("--learning_rate", default=5e-5, type=float,
                         help="The initial learning rate for Adam.")
@@ -275,11 +262,7 @@ def main():
                         help="Number of training steps between evaluations.")
     parser.add_argument("--seed", type=int, default=66,
                         help="random seed for initialization")
-<<<<<<< HEAD
     parser.add_argument("--num_class", type=int, default=97,
-=======
-    parser.add_argument("--num_class", type=int, default=1,
->>>>>>> dd6e4e7 (First commit)
                         help="Number of relation types in dataset.")
 
     parser.add_argument("--unet_in_dim", type=int, default=3,
@@ -296,7 +279,7 @@ def main():
                         help="log.")
     parser.add_argument("--train_from_saved_model", type=str, default='',
                         help="train from a saved model.")
-    parser.add_argument("--dataset", type=str, default='cdr',
+    parser.add_argument("--dataset", type=str, default='docred',
                         help="dataset type")
 
     args = parser.parse_args()
@@ -312,32 +295,24 @@ def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     args.n_gpu = torch.cuda.device_count()
     args.device = device
-<<<<<<< HEAD
 
-=======
-    print(args.num_class)
->>>>>>> dd6e4e7 (First commit)
     config = AutoConfig.from_pretrained(
-        "./bert-base-cased/config.json",
+        "./roberta-base/config.json",
         num_labels=args.num_class,
     )
-    tokenizer =AutoTokenizer.from_pretrained("./bert-base-cased",local_files_only=True,config=config)
+    tokenizer =AutoTokenizer.from_pretrained("./roberta-base",local_files_only=True,config=config)
 
     Dataset = ReadDataset(args.dataset, tokenizer, args.max_seq_length)
-    print("file start")
+
     train_file = os.path.join(args.data_dir, args.train_file)
     dev_file = os.path.join(args.data_dir, args.dev_file)
     test_file = os.path.join(args.data_dir, args.test_file)
-    print("file end")
-    print(train_file)
-    time00=time.time()
     train_features = Dataset.read(train_file)
     dev_features = Dataset.read(dev_file)
     test_features = Dataset.read(test_file)
-    time1 = time.time()
-    logging('| dataset gerenate result:{}'.format(time1-time00))
 
-    model = AutoModel.from_pretrained("./bert-base-cased",local_files_only=True,config=config)
+
+    model = AutoModel.from_pretrained("./roberta-base",local_files_only=True,config=config)
 
     config.cls_token_id = tokenizer.cls_token_id
     config.sep_token_id = tokenizer.sep_token_id
@@ -346,18 +321,9 @@ def main():
     set_seed(args)
     timemodel=time.time()
     model = DocREModel(config, args, model, num_labels=args.num_labels)
-<<<<<<< HEAD
-    num_params = count_parameters(model)
-    logging(f"Number of parameters: {num_params}")
     timemodeleng = time.time()
     time_model_total=timemodeleng-timemodel
-    logging('time_model_total.'.format(time_model_total))
-=======
-
-
-
-
->>>>>>> dd6e4e7 (First commit)
+    print("time_model_total.".format(time_model_total))
     if args.train_from_saved_model != '':
         model.load_state_dict(torch.load(args.train_from_saved_model)["checkpoint"])
         print("load saved model from {}.".format(args.train_from_saved_model))
@@ -366,15 +332,7 @@ def main():
         print("Let's use", torch.cuda.device_count(), "GPUs!")
         model = torch.nn.DataParallel(model, device_ids=list(range(torch.cuda.device_count())))
     model.to(device)
-<<<<<<< HEAD
-    # 获取当前分配的内存总量（以字节为单位）
-    memory_allocated = torch.cuda.memory_allocated() / (1024 ** 3)  # 转换为 GB
 
-    # 使用 logging 函数记录内存消耗
-    logging(f"Memory allocated: {memory_allocated:.2f} GB")
-=======
-
->>>>>>> dd6e4e7 (First commit)
     if args.load_path == "":  # Training
         time0= time.time()
         train(args, model, train_features, dev_features, test_features)
@@ -383,9 +341,7 @@ def main():
 
         logging('| Final test result:{}'.format(test_output))
         time10 = time.time()
-        train_total_time=time10-time0
-        run_total_time = time10 - time00
-        logging('| train_total_time:{}'.format(train_total_time))
+        run_total_time=time10-time0
         logging('| run_total_time:{}'.format(run_total_time))
         pred = report(args, model, T_features)
         with open("./submit_result/result.json", "w") as fh:

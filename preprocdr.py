@@ -17,9 +17,16 @@ import random
 import numpy as np
 import gc
 docred_rel2id = json.load(open('./meta/rel2id.json', 'r'))
+<<<<<<< HEAD
 cdr_rel2id = {'1:NR:2': 0, '1:CID:2': 1}
 gda_rel2id = {'1:NR:2': 0, '1:GDA:2': 1}
 
+=======
+cdr_rel2id = {"P737": 1, "Na": 0}
+gda_rel2id = {'1:NR:2': 0, '1:GDA:2': 1}
+
+
+>>>>>>> dd6e4e7 (First commit)
 #import numba as nb
 #from transformers import AutoConfig, AutoModel, AutoTokenizer
 from itertools import chain
@@ -216,6 +223,7 @@ def extract_path(data, keep_sent_order):
 
 
 
+<<<<<<< HEAD
     kd = OrderedDict(sorted(S.items(), key=lambda t: t[0]))
     for i in range(len(path_set_list)):
         Path.append(set(kd[i]))
@@ -230,6 +238,22 @@ def extract_path(data, keep_sent_order):
                 sub_path_idx=path_set_list.index(sub_path_set)
                 upper_path_set_idx = path_set_list.index(upper_path_set)
                 Path[upper_path_set_idx].update(Path[sub_path_idx])
+=======
+#     kd = OrderedDict(sorted(S.items(), key=lambda t: t[0]))
+#     for i in range(len(path_set_list)):
+#         Path.append(set(kd[i]))
+#     # print(kd)
+#     # print(Path)
+
+#     for sub_path_set in  path_set_list:
+#         # print(sub_path_set)
+#         for upper_path_set in path_set_list:
+#             if sub_path_set < upper_path_set:
+#                 # print(upper_path_set)
+#                 sub_path_idx=path_set_list.index(sub_path_set)
+#                 upper_path_set_idx = path_set_list.index(upper_path_set)
+#                 Path[upper_path_set_idx].update(Path[sub_path_idx])
+>>>>>>> dd6e4e7 (First commit)
 
     # print(Path)
 
@@ -237,6 +261,7 @@ def extract_path(data, keep_sent_order):
     #每个path会覆盖集合中的某些点，视为集合U的子集s
     #计算出能全覆盖U的最小子集S={s1,s2..}
     # print("Example:merge[5][6]=",merge[5][6])
+<<<<<<< HEAD
     mini_path_idx_list1=smallestSufficientTeam_fast(e2e_list, Path)
     # print(mini_path_idx_list1)
     # print("len of mini_path_list=",len(mini_path_idx_list1))
@@ -246,6 +271,17 @@ def extract_path(data, keep_sent_order):
     for pathidx in mini_path_idx_list1:
         mini_path_list.append(list(path_set_list[pathidx]))
     # print("mini_path_list=",mini_path_list)
+=======
+#     mini_path_idx_list1=smallestSufficientTeam_fast(e2e_list, Path)
+#     # print(mini_path_idx_list1)
+#     # print("len of mini_path_list=",len(mini_path_idx_list1))
+
+#     #求出能抽取出这个sample的最小三句子组列表：mini_path_list
+#     mini_path_list=[]
+#     for pathidx in mini_path_idx_list1:
+#         mini_path_list.append(list(path_set_list[pathidx]))
+#     # print("mini_path_list=",mini_path_list)
+>>>>>>> dd6e4e7 (First commit)
 
 
     #写出每个三句子组作为一个新的sample的所有信息
@@ -264,12 +300,26 @@ def extract_path(data, keep_sent_order):
 
         # break
 
+<<<<<<< HEAD
     before_e2e_sum=0
     mini_path_2_ht_pairs_list=[]
     for mini_path_idx in mini_path_idx_list1:
         mini_path_2_ht_pairs = Path[mini_path_idx]
         mini_path_2_ht_pairs_list.append(mini_path_2_ht_pairs)
         before_e2e_sum+=len(mini_path_2_ht_pairs)
+=======
+    # before_e2e_sum=0
+    # mini_path_2_ht_pairs_list=[]
+    # for mini_path_idx in mini_path_idx_list1:
+    #     mini_path_2_ht_pairs = Path[mini_path_idx]
+    #     mini_path_2_ht_pairs_list.append(mini_path_2_ht_pairs)
+    #     before_e2e_sum+=len(mini_path_2_ht_pairs)
+    # 展平列表
+    flattened_list = [item for sublist in path_list for item in sublist]
+
+    # 去重并排序
+    unique_sorted_list = sorted(set(flattened_list))
+>>>>>>> dd6e4e7 (First commit)
 
 
     # after_e2esum=0
@@ -309,7 +359,11 @@ def extract_path(data, keep_sent_order):
 # ]
 
 
+<<<<<<< HEAD
     return merge,nodes,mini_path_list
+=======
+    return merge,nodes,unique_sorted_list
+>>>>>>> dd6e4e7 (First commit)
 
 #输入：req_skills = ["java","nodejs","reactjs"], people = [["java"],["nodejs"],["nodejs","reactjs"]]
 #现在有e2e_list: ['[0, 1]', '[0, 2]', '[0, 3]', '[0, 4]', '[0, 5]', '[0, 6]', '[0, 7]', '[0, 8]', '[0, 9]', '[0, 10]', '[0, 11]', '[0, 12]', '[0, 13]', '[0, 14]', '[0, 15]', '[0, 16]', '[1, 2]', '[1, 3]', '[1, 4]', '[1, 5]', '[1, 6]', '[1, 7]', '[1, 8]', '[1, 9]', '[1, 10]', '[1, 11]', '[1, 12]', '[1, 13]', '[1, 14]', '[1, 15]', '[1, 16]', '[2, 3]', '[2, 4]', '[2, 5]', '[2, 6]', '[2, 7]', '[2, 8]', '[2, 9]', '[2, 10]', '[2, 11]', '[2, 12]', '[2, 13]', '[2, 14]', '[2, 15]', '[2, 16]', '[3, 4]', '[3, 5]', '[3, 6]', '[3, 7]', '[3, 8]', '[3, 9]', '[3, 10]', '[3, 11]', '[3, 12]', '[3, 13]', '[3, 14]', '[3, 15]', '[3, 16]', '[4, 5]', '[4, 6]', '[4, 7]', '[4, 8]', '[4, 9]', '[4, 10]', '[4, 11]', '[4, 12]', '[4, 13]', '[4, 14]', '[4, 15]', '[4, 16]', '[5, 6]', '[5, 7]', '[5, 8]', '[5, 9]', '[5, 10]', '[5, 11]', '[5, 12]', '[5, 13]', '[5, 14]', '[5, 15]', '[5, 16]', '[6, 7]', '[6, 8]', '[6, 9]', '[6, 10]', '[6, 11]', '[6, 12]', '[6, 13]', '[6, 14]', '[6, 15]', '[6, 16]', '[7, 8]', '[7, 9]', '[7, 10]', '[7, 11]', '[7, 12]', '[7, 13]', '[7, 14]', '[7, 15]', '[7, 16]', '[8, 9]', '[8, 10]', '[8, 11]', '[8, 12]', '[8, 13]', '[8, 14]', '[8, 15]', '[8, 16]', '[9, 10]', '[9, 11]', '[9, 12]', '[9, 13]', '[9, 14]', '[9, 15]', '[9, 16]', '[10, 11]', '[10, 12]', '[10, 13]', '[10, 14]', '[10, 15]', '[10, 16]', '[11, 12]', '[11, 13]', '[11, 14]', '[11, 15]', '[11, 16]', '[12, 13]', '[12, 14]', '[12, 15]', '[12, 16]', '[13, 14]', '[13, 15]', '[13, 16]', '[14, 15]', '[14, 16]', '[15, 16]']
@@ -427,6 +481,7 @@ def read_docred(transfermers, file_in, save_file, tokenizer, max_seq_length=1024
 
             entities = sample['vertexSet']
             sentss = sample["sents"]
+<<<<<<< HEAD
 
             for allsenids in min_path_list:
 
@@ -478,14 +533,74 @@ def read_docred(transfermers, file_in, save_file, tokenizer, max_seq_length=1024
                             else:
                                 special_token = ['*']
                             tokens_wordpiece = tokens_wordpiece + special_token
+=======
+            ids = list(map(nodes.__getitem__, min_path_list))
+            select_entity_idxs = list(chain.from_iterable(ids))
+            select_entity_idx = list(set(select_entity_idxs))
+            select_entity_idx.sort()
+
+                # 根据实体id 找实体
+            select_entity = list(map(entities.__getitem__, select_entity_idx))
+            select_sentence = list(map(sentss.__getitem__, min_path_list))
+
+            entity_start, entity_end = [], []
+            mention_types = []
+                #for entity in entities:
+            for entity in select_entity:
+                for mention in entity:
+                    sent_id = mention["sent_id"]
+                    pos = mention["pos"]
+                    entity_start.append((sent_id, pos[0]))
+                    entity_end.append((sent_id, pos[1] - 1))
+                    mention_types.append(mention['type'])
+
+            sents = []
+
+            sent_map = []
+
+            for i_s, sent in enumerate(sample['sents']):
+                    #print(sent)
+                new_map = {}
+                for i_t, token in enumerate(sent):
+                    tokens_wordpiece = tokenizer.tokenize(token)
+                    if (i_s, i_t) in entity_start:
+                        t = entity_start.index((i_s, i_t))
+                        if transfermers == 'bert':
+                            mention_type = mention_types[t]
+                            special_token_i = entity_type.index(mention_type)
+                            special_token = ['[unused' + str(special_token_i) + ']']
+                        else:
+                            special_token = ['*']
+                        tokens_wordpiece = special_token + tokens_wordpiece
+                            # tokens_wordpiece = ["[unused0]"]+ tokens_wordpiece
+
+                    if (i_s, i_t) in entity_end:
+                        t = entity_end.index((i_s, i_t))
+                        if transfermers == 'bert':
+                            mention_type = mention_types[t]
+                            special_token_i = entity_type.index(mention_type) + 50
+                            special_token = ['[unused' + str(special_token_i) + ']']
+                        else:
+                            special_token = ['*']
+                        tokens_wordpiece = tokens_wordpiece + special_token
+>>>>>>> dd6e4e7 (First commit)
 
                             # tokens_wordpiece = tokens_wordpiece + ["[unused1]"]
                             # print(tokens_wordpiece,tokenizer.convert_tokens_to_ids(tokens_wordpiece))
 
+<<<<<<< HEAD
                         new_map[i_t] = len(sents)
                         sents.extend(tokens_wordpiece)
                     new_map[i_t + 1] = len(sents)
                     sent_map.append(new_map)
+=======
+                    new_map[i_t] = len(sents)
+                    sents.extend(tokens_wordpiece)
+
+                new_map[i_t + 1] = len(sents)
+                    #print(new_map)
+                sent_map.append(new_map)
+>>>>>>> dd6e4e7 (First commit)
 
                 # sents_bufen=[]
                 # for i_s, sent in enumerate(select_sentence):
@@ -520,6 +635,7 @@ def read_docred(transfermers, file_in, save_file, tokenizer, max_seq_length=1024
 
 
 
+<<<<<<< HEAD
                 entity_pos = []
                 #for e in entities:
                 for e in entities:
@@ -552,10 +668,47 @@ def read_docred(transfermers, file_in, save_file, tokenizer, max_seq_length=1024
                         else:
                             train_triple[(label['h'], label['t'])].append(
                                 {'relation': r, 'evidence': evidence})
+=======
+            entity_pos = []
+                #for e in entities:
+            for e in entities:
+                entity_pos.append([])
+                mention_num = len(e)
+                   # print(e)
+                for m in e:
+                    start = sent_map[m["sent_id"]][m["pos"][0]]
+                    end = sent_map[m["sent_id"]][m["pos"][1]]
+                    entity_pos[-1].append((start, end,))
+
+                        # 选择句子中所有label
+            labels_select = []
+            if "labels" in sample:
+                for label in sample['labels']:
+                    if label['h'] in select_entity_idx and label['t'] in select_entity_idx:
+                        labels_select.append(label)
+                    # if len(labels_select) == 0:
+                    #     continue
+
+            train_triple = {}
+            relations, hts = [], []
+            if "labels" in sample:
+                for label in labels_select:
+                    #for label in sample['labels']:
+                    evidence = label['evidence']
+                        #print(label['r'])
+                    r = int(cdr_rel2id[label['r']])
+                    if (label['h'], label['t']) not in train_triple:
+                        train_triple[(label['h'], label['t'])] = [
+                            {'relation': r, 'evidence': evidence}]
+                    else:
+                        train_triple[(label['h'], label['t'])].append(
+                            {'relation': r, 'evidence': evidence})
+>>>>>>> dd6e4e7 (First commit)
                 ##if "labels" in sample:
                 #if "labels" in sample:
 
                 # Get positive samples from dataset
+<<<<<<< HEAD
                 for h, t in train_triple.keys():
                     relation = [0] * len(docred_rel2id)
                     for mention in train_triple[h, t]:
@@ -573,12 +726,35 @@ def read_docred(transfermers, file_in, save_file, tokenizer, max_seq_length=1024
                             relations.append(relation)
                             hts.append([h, t])
                             neg_samples += 1
+=======
+            for h, t in train_triple.keys():
+                relation = [0] * len(cdr_rel2id)
+                for mention in train_triple[h, t]:
+                    relation[mention["relation"]] = 1
+                        # evidence = mention["evidence"]
+                relations.append(relation)
+                hts.append([h, t])
+                pos_samples += 1
+
+                # Get negative samples from dataset
+            for h in range(len(select_entity)):
+                for t in range(len(select_entity)):
+                    if h != t and [h, t] not in hts:
+                        relation = [1] + [0] * (len(cdr_rel2id) - 1)
+                        relations.append(relation)
+                        hts.append([h, t])
+                        neg_samples += 1
+>>>>>>> dd6e4e7 (First commit)
 
                 # else:  # 无标签实体对的处理方式与有标签实体对相同
                 #     for h in range(len(entities)):
                 #         for t in range(len(entities)):
                 #             if h != t:
+<<<<<<< HEAD
                 #                # relation = [1] + [0] * (len(docred_rel2id) - 1)
+=======
+                #                # relation = [1] + [0] * (len(cdr_rel2id) - 1)
+>>>>>>> dd6e4e7 (First commit)
                 #                 relation = [1] * (len(docred_rel2id) - 1)
                 #                 relations.append(relation)
                 #                 hts.append([h, t])
@@ -588,6 +764,7 @@ def read_docred(transfermers, file_in, save_file, tokenizer, max_seq_length=1024
 
                 # assert len(relations) == len(entities) * (len(entities) - 1)
 
+<<<<<<< HEAD
                 if len(hts) == 0:
                     print(len(sent))
                 sents = sents[:max_seq_length - 2]
@@ -601,6 +778,24 @@ def read_docred(transfermers, file_in, save_file, tokenizer, max_seq_length=1024
                            'title': sample['title'],
                            }
                 features.append(feature)
+=======
+            if len(hts) == 0:
+                print(len(sent))
+            sents = sents[:max_seq_length - 2]
+                #sents = sents_bufen[:max_seq_length - 2]
+            input_ids = tokenizer.convert_tokens_to_ids(sents)
+            input_ids = tokenizer.build_inputs_with_special_tokens(input_ids)
+            feature = {'input_ids': input_ids,
+                        'entity_pos': entity_pos,
+                        'labels': relations,
+                        'hts': hts,
+                        'title': sample['title'],
+                        }
+            features.append(feature)
+           # for allsenids in min_path_list:
+
+
+>>>>>>> dd6e4e7 (First commit)
 
                 # else:
                 #     default_relation = [1]+[0] * (len(cdr_rel2id)-1)

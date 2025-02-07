@@ -10,6 +10,7 @@ from sklearn.metrics import precision_recall_fscore_support as prfs
 METRIC_LABELS = ['prec_micro', 'rec_micro', 'f1_micro', 'prec_macro', 'rec_macro', 'f1_macro']
 
 rel2id = json.load(open('meta/rel2id.json', 'r'))
+<<<<<<< HEAD
 id2rel = {value: key for key, value in rel2id.items()}
 
 
@@ -17,10 +18,18 @@ id2rel = {value: key for key, value in rel2id.items()}
 
 def findSmallestDifference(A, B, m, n):
  
+=======
+cdr_rel2id = {"P737": 1, "Na": 0}
+id2rel = {value: key for key, value in cdr_rel2id.items()}
+
+
+def findSmallestDifference(A, B, m, n):
+>>>>>>> dd6e4e7 (First commit)
     # Sort both arrays
     # using sort function
     A.sort()
     B.sort()
+<<<<<<< HEAD
  
     a = 0
     b = 0
@@ -39,14 +48,37 @@ def findSmallestDifference(A, B, m, n):
         if (A[a] < B[b]):
             a += 1
  
+=======
+
+    a = 0
+    b = 0
+
+    # Initialize result as max value
+    result = sys.maxsize
+
+    # Scan Both Arrays upto
+    # sizeof of the Arrays
+    while (a < m and b < n):
+
+        if (abs(A[a] - B[b]) < result):
+            result = abs(A[a] - B[b])
+
+        # Move Smaller Value
+        if (A[a] < B[b]):
+            a += 1
+
+>>>>>>> dd6e4e7 (First commit)
         else:
             b += 1
     # return final sma result
     return result
 
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> dd6e4e7 (First commit)
 def to_official(preds, features):
     h_idx, t_idx, title = [], [], []
 
@@ -72,6 +104,10 @@ def to_official(preds, features):
                 )
     return res
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dd6e4e7 (First commit)
 def to_official_by_doc(preds, features):
     h_idx, t_idx, title = [], [], []
     res = []
@@ -81,7 +117,10 @@ def to_official_by_doc(preds, features):
         t_idx = [ht[1] for ht in hts]
         title = [f["title"] for ht in hts]
         local_res = []
+<<<<<<< HEAD
         
+=======
+>>>>>>> dd6e4e7 (First commit)
 
         for i in range(pred.shape[0]):
             pred_i = np.nonzero(pred[i])[0].tolist()
@@ -98,6 +137,10 @@ def to_official_by_doc(preds, features):
         res.append(local_res)
     return res
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dd6e4e7 (First commit)
 def gen_train_facts(data_file_name, truth_dir):
     fact_file_name = data_file_name[data_file_name.find("train_"):]
     fact_file_name = os.path.join(truth_dir, fact_file_name.replace(".json", ".fact"))
@@ -134,7 +177,12 @@ def official_evaluate(tmp, path, train_file, dev_file):
         os.makedirs(truth_dir)
 
     fact_in_train_annotated = gen_train_facts(os.path.join(path, train_file), truth_dir)
+<<<<<<< HEAD
     fact_in_train_distant = gen_train_facts(os.path.join(path, "train_distant.json"), truth_dir)
+=======
+    '''
+    fact_in_train_distant = gen_train_facts(os.path.join(path, "train_distant.json"), truth_dir)  '''
+>>>>>>> dd6e4e7 (First commit)
 
     truth = json.load(open(os.path.join(path, dev_file)))
 
@@ -160,10 +208,17 @@ def official_evaluate(tmp, path, train_file, dev_file):
 
     tot_relations = len(std)
     tmp.sort(key=lambda x: (x['title'], x['h_idx'], x['t_idx'], x['r']))
+<<<<<<< HEAD
     if len(tmp)>0:
         submission_answer = [tmp[0]]
     else:
         return 0, 0, 0, 0 , 0, 0
+=======
+    if len(tmp) > 0:
+        submission_answer = [tmp[0]]
+    else:
+        return 0, 0, 0, 0, 0, 0
+>>>>>>> dd6e4e7 (First commit)
     for i in range(1, len(tmp)):
         x = tmp[i]
         y = tmp[i - 1]
@@ -202,8 +257,12 @@ def official_evaluate(tmp, path, train_file, dev_file):
                 for n2 in vertexSet[t_idx]:
                     if (n1['name'], n2['name'], r) in fact_in_train_annotated:
                         in_train_annotated = True
+<<<<<<< HEAD
                     if (n1['name'], n2['name'], r) in fact_in_train_distant:
                         in_train_distant = True
+=======
+
+>>>>>>> dd6e4e7 (First commit)
 
             if in_train_annotated:
                 correct_in_train_annotated += 1
@@ -224,8 +283,15 @@ def official_evaluate(tmp, path, train_file, dev_file):
     else:
         evi_f1 = 2.0 * evi_p * evi_r / (evi_p + evi_r)
 
+<<<<<<< HEAD
     re_p_ignore_train_annotated = 1.0 * (correct_re - correct_in_train_annotated) / (len(submission_answer) - correct_in_train_annotated + 1e-5)
     re_p_ignore_train = 1.0 * (correct_re - correct_in_train_distant) / (len(submission_answer) - correct_in_train_distant + 1e-5)
+=======
+    re_p_ignore_train_annotated = 1.0 * (correct_re - correct_in_train_annotated) / (
+                len(submission_answer) - correct_in_train_annotated + 1e-5)
+    re_p_ignore_train = 1.0 * (correct_re - correct_in_train_distant) / (
+                len(submission_answer) - correct_in_train_distant + 1e-5)
+>>>>>>> dd6e4e7 (First commit)
 
     if re_p_ignore_train_annotated + re_r == 0:
         re_f1_ignore_train_annotated = 0
@@ -237,8 +303,12 @@ def official_evaluate(tmp, path, train_file, dev_file):
     else:
         re_f1_ignore_train = 2.0 * re_p_ignore_train * re_r / (re_p_ignore_train + re_r)
 
+<<<<<<< HEAD
     return re_f1, evi_f1, re_f1_ignore_train_annotated, re_f1_ignore_train , re_p, re_r
 
+=======
+    return re_f1, evi_f1, re_f1_ignore_train_annotated, re_f1_ignore_train, re_p, re_r
+>>>>>>> dd6e4e7 (First commit)
 
 
 def official_evaluate_benchmark(tmp, path, train_file, dev_file):
@@ -246,14 +316,22 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
         Adapted from the official evaluation code
     '''
     freq_keys = set(['P17', 'P131', 'P27', 'P150', 'P175', 'P577', 'P463', 'P527', 'P495', 'P361'])
+<<<<<<< HEAD
     long_tail_keys = set(rel2id.keys()) - freq_keys
+=======
+    long_tail_keys = set(cdr_rel2id.keys()) - freq_keys
+>>>>>>> dd6e4e7 (First commit)
     truth_dir = os.path.join(path, 'ref')
 
     if not os.path.exists(truth_dir):
         os.makedirs(truth_dir)
 
     fact_in_train_annotated = gen_train_facts(os.path.join(path, train_file), truth_dir)
+<<<<<<< HEAD
     fact_in_train_distant = gen_train_facts(os.path.join(path, "train_distant.json"), truth_dir)
+=======
+
+>>>>>>> dd6e4e7 (First commit)
 
     truth = json.load(open(os.path.join(path, dev_file)))
 
@@ -280,6 +358,7 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
             t_idx = label['t']
             h_sent_set = [x['sent_id'] for x in vertexSet[h_idx]]
             t_sent_set = [x['sent_id'] for x in vertexSet[t_idx]]
+<<<<<<< HEAD
             
             std[(title, r, h_idx, t_idx)] = set(label['evidence'])
             tot_evidences += len(label['evidence'])
@@ -288,19 +367,37 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
             if 1 <= findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set),len(t_sent_set) )  :
                 std_inter[(title, r, h_idx, t_idx)] = set(label['evidence'])
             if 5 < findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set),len(t_sent_set) )  :
+=======
+
+            std[(title, r, h_idx, t_idx)] = set(label['evidence'])
+            tot_evidences += len(label['evidence'])
+            if findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set), len(t_sent_set)) == 0:
+                std_intra[(title, r, h_idx, t_idx)] = set(label['evidence'])
+            if 1 <= findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set), len(t_sent_set)):
+                std_inter[(title, r, h_idx, t_idx)] = set(label['evidence'])
+            if 5 < findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set), len(t_sent_set)):
+>>>>>>> dd6e4e7 (First commit)
                 std_inter_long[(title, r, h_idx, t_idx)] = set(label['evidence'])
             if r in freq_keys:
                 std_freq[(title, r, h_idx, t_idx)] = set(label['evidence'])
             if r in long_tail_keys:
                 std_long_tail[(title, r, h_idx, t_idx)] = set(label['evidence'])
+<<<<<<< HEAD
                 
+=======
+
+>>>>>>> dd6e4e7 (First commit)
     tot_relations = len(std)
     tot_relations_freq = len(std_freq)
     tot_relations_long_tail = len(std_long_tail)
     tot_relations_intra = len(std_intra)
     tot_relations_inter = len(std_inter)
     tot_relations_inter_long = len(std_inter_long)
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> dd6e4e7 (First commit)
     tmp.sort(key=lambda x: (x['title'], x['h_idx'], x['t_idx'], x['r']))
     if len(tmp) > 1:
         submission_answer = [tmp[0]]
@@ -308,11 +405,19 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
             x = tmp[i]
             y = tmp[i - 1]
             if (x['title'], x['h_idx'], x['t_idx'], x['r']) != (y['title'], y['h_idx'], y['t_idx'], y['r']):
+<<<<<<< HEAD
                 submission_answer.append(tmp[i]) 
     else: 
         submission_answer = []
     submission_answer_freq = []
     submission_answer_long_tail =[] 
+=======
+                submission_answer.append(tmp[i])
+    else:
+        submission_answer = []
+    submission_answer_freq = []
+    submission_answer_long_tail = []
+>>>>>>> dd6e4e7 (First commit)
 
     submission_answer_freq = [x for x in submission_answer if x['r'] in freq_keys]
     submission_answer_long_tail = [x for x in submission_answer if x['r'] in long_tail_keys]
@@ -320,17 +425,29 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
     submission_answer_inter = []
     submission_answer_inter_long = []
     for i in range(len(submission_answer)):
+<<<<<<< HEAD
         vertexSet = title2vectexSet[submission_answer[i]['title']] 
+=======
+        vertexSet = title2vectexSet[submission_answer[i]['title']]
+>>>>>>> dd6e4e7 (First commit)
         if title not in title2vectexSet:
             print(title)
             continue
         h_sent_set = [x['sent_id'] for x in vertexSet[submission_answer[i]['h_idx']]]
         t_sent_set = [x['sent_id'] for x in vertexSet[submission_answer[i]['t_idx']]]
+<<<<<<< HEAD
         if findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set),len(t_sent_set) )==0:
             submission_answer_intra.append(submission_answer[i])
         if 1<= findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set),len(t_sent_set))  :
             submission_answer_inter.append(submission_answer[i])
         if 5 < findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set),len(t_sent_set)) :
+=======
+        if findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set), len(t_sent_set)) == 0:
+            submission_answer_intra.append(submission_answer[i])
+        if 1 <= findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set), len(t_sent_set)):
+            submission_answer_inter.append(submission_answer[i])
+        if 5 < findSmallestDifference(h_sent_set, t_sent_set, len(h_sent_set), len(t_sent_set)):
+>>>>>>> dd6e4e7 (First commit)
             submission_answer_inter_long.append(submission_answer[i])
 
     correct_re = 0
@@ -370,8 +487,12 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
                 for n2 in vertexSet[t_idx]:
                     if (n1['name'], n2['name'], r) in fact_in_train_annotated:
                         in_train_annotated = True
+<<<<<<< HEAD
                     if (n1['name'], n2['name'], r) in fact_in_train_distant:
                         in_train_distant = True
+=======
+
+>>>>>>> dd6e4e7 (First commit)
 
             if in_train_annotated:
                 correct_in_train_annotated += 1
@@ -427,7 +548,10 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
         if (title, r, h_idx, t_idx) in std_inter:
             correct_re_inter += 1
 
+<<<<<<< HEAD
  
+=======
+>>>>>>> dd6e4e7 (First commit)
     for x in submission_answer_inter_long:
         title = x['title']
         h_idx = x['h_idx']
@@ -441,8 +565,12 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
         if (title, r, h_idx, t_idx) in std_inter_long:
             correct_re_inter_long += 1
 
+<<<<<<< HEAD
 
     if len(submission_answer)>0:        
+=======
+    if len(submission_answer) > 0:
+>>>>>>> dd6e4e7 (First commit)
         re_p = 1.0 * correct_re / len(submission_answer)
     else:
         re_p = 0
@@ -452,39 +580,67 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
     else:
         re_f1 = 2.0 * re_p * re_r / (re_p + re_r)
 
+<<<<<<< HEAD
     if len(submission_answer_freq)>0:        
         re_p_freq = 1.0 * correct_re_freq / len(submission_answer_freq)
     else:
         re_p_freq = 0
     
+=======
+    if len(submission_answer_freq) > 0:
+        re_p_freq = 1.0 * correct_re_freq / len(submission_answer_freq)
+    else:
+        re_p_freq = 0
+
+>>>>>>> dd6e4e7 (First commit)
     re_r_freq = 1.0 * correct_re_freq / tot_relations_freq
     if re_p_freq + re_r_freq == 0:
         re_f1_freq = 0
     else:
         re_f1_freq = 2.0 * re_p_freq * re_r_freq / (re_p_freq + re_r_freq)
+<<<<<<< HEAD
     if len(submission_answer_long_tail)>0:        
         re_p_long_tail = 1.0 * correct_re_long_tail / len(submission_answer_long_tail)
     else:
         re_p_long_tail = 0
     
+=======
+    if len(submission_answer_long_tail) > 0:
+        re_p_long_tail = 1.0 * correct_re_long_tail / len(submission_answer_long_tail)
+    else:
+        re_p_long_tail = 0
+
+>>>>>>> dd6e4e7 (First commit)
     re_r_long_tail = 1.0 * correct_re_long_tail / tot_relations_long_tail
     if re_p_long_tail + re_r_long_tail == 0:
         re_f1_long_tail = 0
     else:
         re_f1_long_tail = 2.0 * re_p_long_tail * re_r_long_tail / (re_p_long_tail + re_r_long_tail)
 
+<<<<<<< HEAD
     if len(submission_answer_intra)>0:        
         re_p_intra = 1.0 * correct_re_intra / len(submission_answer_intra)
     else:
         re_p_intra = 0
     
+=======
+    if len(submission_answer_intra) > 0:
+        re_p_intra = 1.0 * correct_re_intra / len(submission_answer_intra)
+    else:
+        re_p_intra = 0
+
+>>>>>>> dd6e4e7 (First commit)
     re_r_intra = 1.0 * correct_re_intra / tot_relations_intra
     if re_p_intra + re_r_intra == 0:
         re_f1_intra = 0
     else:
         re_f1_intra = 2.0 * re_p_intra * re_r_intra / (re_p_intra + re_r_intra)
 
+<<<<<<< HEAD
     if len(submission_answer_inter)>0:        
+=======
+    if len(submission_answer_inter) > 0:
+>>>>>>> dd6e4e7 (First commit)
         re_p_inter = 1.0 * correct_re_inter / len(submission_answer_inter)
     else:
         re_p_inter = 0
@@ -494,8 +650,11 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
     else:
         re_f1_inter = 2.0 * re_p_inter * re_r_inter / (re_p_inter + re_r_inter)
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> dd6e4e7 (First commit)
     evi_p = 1.0 * correct_evidence / pred_evi if pred_evi > 0 else 0
     evi_r = 1.0 * correct_evidence / tot_evidences
     if evi_p + evi_r == 0:
@@ -503,8 +662,15 @@ def official_evaluate_benchmark(tmp, path, train_file, dev_file):
     else:
         evi_f1 = 2.0 * evi_p * evi_r / (evi_p + evi_r)
 
+<<<<<<< HEAD
     re_p_ignore_train_annotated = 1.0 * (correct_re - correct_in_train_annotated) / (len(submission_answer) - correct_in_train_annotated + 1e-5)
     re_p_ignore_train = 1.0 * (correct_re - correct_in_train_distant) / (len(submission_answer) - correct_in_train_distant + 1e-5)
+=======
+    re_p_ignore_train_annotated = 1.0 * (correct_re - correct_in_train_annotated) / (
+                len(submission_answer) - correct_in_train_annotated + 1e-5)
+    re_p_ignore_train = 1.0 * (correct_re - correct_in_train_distant) / (
+                len(submission_answer) - correct_in_train_distant + 1e-5)
+>>>>>>> dd6e4e7 (First commit)
 
     if re_p_ignore_train_annotated + re_r == 0:
         re_f1_ignore_train_annotated = 0

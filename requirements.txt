@@ -1,6 +1,14 @@
+<<<<<<< HEAD
 #torch==1.5.0
 transformers==3.0.4
 opt-einsum==3.3.0
 ujson
 tqdm
+=======
+torch==1.5.0
+transformers==3.0.2
+opt-einsum==3.3.0
+ujson
+tqdm
+>>>>>>> dd6e4e7 (First commit)
 allennlp

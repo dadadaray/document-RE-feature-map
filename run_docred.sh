@@ -1,5 +1,9 @@
 #! /bin/bash
+<<<<<<< HEAD
 export CUDA_VISIBLE_DEVICES=1
+=======
+export CUDA_VISIBLE_DEVICES=0
+>>>>>>> dd6e4e7 (First commit)
 
 # -------------------Training Shell Script--------------------
 if true; then
@@ -9,7 +13,11 @@ if true; then
     bs=2
     bl=3e-5
     uls=(4e-4)
+<<<<<<< HEAD
     accum=1
+=======
+    accum=2
+>>>>>>> dd6e4e7 (First commit)
     for ul in ${uls[@]}
     do
     python -u ./train_balanceloss.py --data_dir ./dataset/Re-DocRED\
@@ -38,6 +46,7 @@ if true; then
   elif [[ $transformer_type == roberta ]]; then
     type=context-based
     bs=2
+<<<<<<< HEAD
     bls=(3e-5 2e-4)
     ul=4e-4
     accum=2
@@ -46,6 +55,16 @@ if true; then
     python -u ./train_balanceloss.py --data_dir ./dataset/docred \
     --channel_type $channel_type \
     --bert_lr $bl \
+=======
+    bls=6e-5
+    uls=(4e-4)
+    accum=2
+    for ul in ${uls[@]}
+    do
+    python -u ./train_balanceloss_roberta.py --data_dir ./dataset/Re-DocRED \
+    --channel_type $channel_type \
+    --bert_lr $bls \
+>>>>>>> dd6e4e7 (First commit)
     --transformer_type $transformer_type \
     --model_name_or_path ./roberta \
     --train_file train_annotated.json \
@@ -59,10 +78,17 @@ if true; then
     --max_grad_norm 1.0 \
     --warmup_ratio 0.06 \
     --num_train_epochs 30 \
+<<<<<<< HEAD
     --seed 111 \
     --num_class 97 \
     --save_path ./checkpoint/docred/train_roberta-lr${bl}_accum${accum}_unet-lr${ul}_type_${channel_type}.pt \
     --log_dir ./logs/docred/train_roberta-lr${bl}_accum${accum}_unet-lr${ul}_type_${channel_type}.log
+=======
+    --seed 66 \
+    --num_class 97 \
+    --save_path ./checkpoint/docred/train_roberta-lr${bls}_accum${accum}_unet-lr${ul}_type_${channel_type}.pt \
+    --log_dir ./logs/docred/train_roberta-lr${bls}_accum${accum}_unet-lr${ul}_type_${channel_type}.log
+>>>>>>> dd6e4e7 (First commit)
     done
   fi
 fi

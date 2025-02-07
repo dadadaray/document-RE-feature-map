@@ -9,7 +9,11 @@ import torch
 
 import ujson as json
 from torch.utils.data import DataLoader
+<<<<<<< HEAD
 from transformers import AutoConfig, AutoModel, AutoTokenizer
+=======
+from transformers import AutoConfig, AutoTokenizer, AutoModel
+>>>>>>> dd6e4e7 (First commit)
 from transformers.optimization import AdamW, get_linear_schedule_with_warmup
 from model_balanceloss import DocREModel
 from utils_sample import set_seed, collate_fn
@@ -17,6 +21,10 @@ from evaluation import to_official, official_evaluate
 from prepro import ReadDataset
 
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dd6e4e7 (First commit)
 def train(args, model, train_features, dev_features, test_features):
     def logging(s, print_=True, log_=True):
         if print_:
@@ -29,10 +37,18 @@ def train(args, model, train_features, dev_features, test_features):
         cur_model = model.module if hasattr(model, 'module') else model
         if args.train_from_saved_model != '':
             best_score = torch.load(args.train_from_saved_model)["best_f1"]
+<<<<<<< HEAD
+=======
+
+>>>>>>> dd6e4e7 (First commit)
             epoch_delta = torch.load(args.train_from_saved_model)["epoch"] + 1
         else:
             epoch_delta = 0
             best_score = -1
+<<<<<<< HEAD
+=======
+
+>>>>>>> dd6e4e7 (First commit)
         train_dataloader = DataLoader(features, batch_size=args.train_batch_size, shuffle=True, collate_fn=collate_fn,
                                       drop_last=True)
         train_iterator = [epoch + epoch_delta for epoch in range(num_epoch)]
@@ -47,6 +63,10 @@ def train(args, model, train_features, dev_features, test_features):
         log_step = 100
         total_loss = 0
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dd6e4e7 (First commit)
         # scaler = GradScaler()
         for epoch in train_iterator:
             start_time = time.time()
@@ -93,13 +113,18 @@ def train(args, model, train_features, dev_features, test_features):
                             '| epoch {:2d} | step {:4d} | min/b {:5.2f} | lr {} | train loss {:5.3f}'.format(
                                 epoch, global_step, elapsed / 60, scheduler.get_last_lr(), cur_loss * 1000))
                         total_loss = 0
+<<<<<<< HEAD
                         start_time = time.time()
+=======
+
+>>>>>>> dd6e4e7 (First commit)
 
                 if (step + 1) == len(train_dataloader) - 1 or (
                         args.evaluation_steps > 0 and num_steps % args.evaluation_steps == 0 and step % args.gradient_accumulation_steps == 0):
                     # if step ==0:
                     logging('-' * 89)
                     eval_start_time = time.time()
+<<<<<<< HEAD
                     dev_score, dev_output = evaluate(args, model, dev_features,"dev.json", tag="dev")
                     test_score, test_output = evaluate(args, model, test_features,"test.json", tag="test")
                     # train_score, train_output = evaluate(args, model, train_features, tag="dev")
@@ -110,12 +135,21 @@ def train(args, model, train_features, dev_features, test_features):
                     logging(
                         '| epoch {:3d} | time: {:5.2f}s | dev_output:{}|test_output:{}|train loss {:5.3f}'.format(epoch, time.time() - eval_start_time,
                                                                                 dev_output,test_output,cur_loss*1000))
+=======
+                    dev_score, dev_output = evaluate(args, model, dev_features,tag="dev")
+
+
+                    logging(
+                        '| epoch {:3d} | time: {:5.2f}s | dev_result:{}'.format(epoch, time.time() - eval_start_time,
+                                                                                dev_output))
+>>>>>>> dd6e4e7 (First commit)
 
                     logging('-' * 89)
                     if dev_score > best_score:
                         best_score = dev_score
                         logging(
                             '| epoch {:3d} | best_f1:{}'.format(epoch, best_score))
+<<<<<<< HEAD
                         pred = report(args, model, test_features)
                         with open("./submit_result/best_result.json", "w") as fh:
                             json.dump(pred, fh)
@@ -127,6 +161,14 @@ def train(args, model, train_features, dev_features, test_features):
                                 'optimizer': optimizer.state_dict()
                             }, args.save_path
                                 , _use_new_zipfile_serialization=False)
+=======
+
+                        pred = report(args, model, test_features)
+
+
+
+
+>>>>>>> dd6e4e7 (First commit)
         return num_steps
 
     cur_model = model.module if hasattr(model, 'module') else model
@@ -142,10 +184,14 @@ def train(args, model, train_features, dev_features, test_features):
 
     optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon,
                       weight_decay=args.weight_decay)
+<<<<<<< HEAD
     # optimizer = torch.optim.SGD(optimizer_grouped_parameters, lr=args.learning_rate, weight_decay=args.weight_decay,
     #                             momentum=0.9)
     # optimizer = torch.optim.Adam(optimizer_grouped_parameters, lr=args.learning_rate, weight_decay=args.weight_decay,
     #                            eps=args.adam_epsilon, betas=(0.9, 0.999))
+=======
+
+>>>>>>> dd6e4e7 (First commit)
     if args.train_from_saved_model != '':
         optimizer.load_state_dict(torch.load(args.train_from_saved_model)["optimizer"])
         print("load saved optimizer from {}.".format(args.train_from_saved_model))
@@ -156,9 +202,15 @@ def train(args, model, train_features, dev_features, test_features):
     finetune(train_features, optimizer, args.num_train_epochs, num_steps, model)
 
 
+<<<<<<< HEAD
 def evaluate(args, model, features, dataset, tag="dev"):
     dataloader = DataLoader(features, batch_size=args.test_batch_size, shuffle=False, collate_fn=collate_fn,
                             drop_last=False)
+=======
+def evaluate(args, model, features, tag="dev"):
+
+    dataloader = DataLoader(features, batch_size=args.test_batch_size, shuffle=False, collate_fn=collate_fn, drop_last=False)
+>>>>>>> dd6e4e7 (First commit)
     preds = []
     total_loss = 0
     for i, batch in enumerate(dataloader):
@@ -183,6 +235,7 @@ def evaluate(args, model, features, dataset, tag="dev"):
     preds = np.concatenate(preds, axis=0).astype(np.float32)
     ans = to_official(preds, features)
     if len(ans) > 0:
+<<<<<<< HEAD
         best_f1, _, best_f1_ign, _, re_p, re_r = official_evaluate(ans, args.data_dir, "train_annotated.json",dataset)
     # else:
     #     best_f1=0
@@ -190,6 +243,13 @@ def evaluate(args, model, features, dataset, tag="dev"):
     #     _re_p=0
     #     _re_r=0
     #     _average_loss=0
+=======
+        if tag=="dev":
+            path="dev.json"
+        if tag=="test":
+            path = "test.json"
+        best_f1, _, best_f1_ign, _, re_p, re_r = official_evaluate(ans, args.data_dir,"train_annotated.json",path)
+>>>>>>> dd6e4e7 (First commit)
     output = {
         tag + "_F1": best_f1 * 100,
         tag + "_F1_ign": best_f1_ign * 100,
@@ -201,8 +261,13 @@ def evaluate(args, model, features, dataset, tag="dev"):
 
 
 def report(args, model, features):
+<<<<<<< HEAD
     dataloader = DataLoader(features, batch_size=args.test_batch_size, shuffle=False, collate_fn=collate_fn,
                             drop_last=False)
+=======
+
+    dataloader = DataLoader(features, batch_size=args.test_batch_size, shuffle=False, collate_fn=collate_fn, drop_last=False)
+>>>>>>> dd6e4e7 (First commit)
     preds = []
     for batch in dataloader:
         model.eval()
@@ -225,9 +290,16 @@ def report(args, model, features):
 
 
 def main():
+<<<<<<< HEAD
     parser = argparse.ArgumentParser()
 
     parser.add_argument("--data_dir", default="./dataset/docred", type=str)
+=======
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--data_dir", default="./dataset/Re-DocRED", type=str)
+>>>>>>> dd6e4e7 (First commit)
     parser.add_argument("--transformer_type", default="bert", type=str)
     parser.add_argument("--model_name_or_path", default="bert-base-cased", type=str)
 
@@ -292,18 +364,37 @@ def main():
                         help="dataset type")
 
     args = parser.parse_args()
+<<<<<<< HEAD
     print('args:', args)
+=======
+
+    def logging(s, print_=True, log_=True):
+        if print_:
+            print(s)
+        if log_:
+            with open(args.log_dir, 'a+') as f_log:
+                f_log.write(s + '\n')
+    print('args:', args)
+
+>>>>>>> dd6e4e7 (First commit)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     args.n_gpu = torch.cuda.device_count()
     args.device = device
 
     config = AutoConfig.from_pretrained(
+<<<<<<< HEAD
         args.config_name if args.config_name else args.model_name_or_path,
         num_labels=args.num_class,
     )
     tokenizer = AutoTokenizer.from_pretrained(
         args.tokenizer_name if args.tokenizer_name else args.model_name_or_path,
     )
+=======
+        "./bert-base-cased/config.json",
+        num_labels=args.num_class,
+    )
+    tokenizer =AutoTokenizer.from_pretrained("./bert-base-cased",local_files_only=True,config=config)
+>>>>>>> dd6e4e7 (First commit)
 
     Dataset = ReadDataset(args.dataset, tokenizer, args.max_seq_length)
 
@@ -314,6 +405,7 @@ def main():
     dev_features = Dataset.read(dev_file)
     test_features = Dataset.read(test_file)
 
+<<<<<<< HEAD
     # print("train_features")
     # print(train_features)
 
@@ -322,13 +414,25 @@ def main():
         from_tf=bool(".ckpt" in args.model_name_or_path),
         config=config,
     )
+=======
+
+    model = AutoModel.from_pretrained("./bert-base-cased",local_files_only=True,config=config)
+>>>>>>> dd6e4e7 (First commit)
 
     config.cls_token_id = tokenizer.cls_token_id
     config.sep_token_id = tokenizer.sep_token_id
     config.transformer_type = args.transformer_type
 
     set_seed(args)
+<<<<<<< HEAD
     model = DocREModel(config, args, model, num_labels=args.num_labels)
+=======
+    timemodel=time.time()
+    model = DocREModel(config, args, model, num_labels=args.num_labels)
+    timemodeleng = time.time()
+    time_model_total=timemodeleng-timemodel
+    print("time_model_total.".format(time_model_total))
+>>>>>>> dd6e4e7 (First commit)
     if args.train_from_saved_model != '':
         model.load_state_dict(torch.load(args.train_from_saved_model)["checkpoint"])
         print("load saved model from {}.".format(args.train_from_saved_model))
@@ -339,6 +443,7 @@ def main():
     model.to(device)
 
     if args.load_path == "":  # Training
+<<<<<<< HEAD
         train(args, model, train_features, dev_features, test_features)
     else:  # Testing
         model.load_state_dict(torch.load(args.load_path)['checkpoint'])
@@ -346,6 +451,34 @@ def main():
         test_score, test_output = evaluate(args, model, dev_features,"test.json", tag="dev")
         print(dev_output)
         print(test_output)
+=======
+        time0= time.time()
+        train(args, model, train_features, dev_features, test_features)
+        T_features = test_features  # Testing on the test se
+        test_score, test_output = evaluate(args, model, test_features, tag="test")
+
+        logging('| Final test result:{}'.format(test_output))
+        time10 = time.time()
+        run_total_time=time10-time0
+        logging('| run_total_time:{}'.format(run_total_time))
+        pred = report(args, model, T_features)
+        with open("./submit_result/result.json", "w") as fh:
+            json.dump(pred, fh)
+
+    else:  # Testing
+        time0 = time.time()
+        model.load_state_dict(torch.load(args.load_path)['checkpoint'])
+        T_features = test_features  # Testing on the test set
+        test_score, test_output = evaluate(args, model, T_features, tag="test")
+        logging('| Test result:{}'.format(test_output))
+        time10 = time.time()
+        run_total_time = time10 - time0
+        logging('| run_total_time:{}'.format(run_total_time))
+        pred = report(args, model, T_features)
+        with open("./submit_result/result.json", "w") as fh:
+            json.dump(pred, fh)
+
+>>>>>>> dd6e4e7 (First commit)
 
 
 if __name__ == "__main__":
