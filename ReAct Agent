@@ -1,1 +1,178 @@
+import json
+import re
+from LLM import ZhipuModel
+
+
+def safe_load_json(json_str, max_retry=3):
+    """鲁棒性极强的JSON解析函数"""
+    for _ in range(max_retry):
+        try:
+            # 预处理：修复常见问题
+            fixed = json_str.strip()
+            
+            # 1. 修复不完整结尾
+            if fixed.endswith(',...') or fixed.endswith('{ "h": ...'):
+                fixed = fixed[:fixed.rfind(',')] + ']'
+            
+            # 2. 修复缺失键的问题（如 "P86" 应该是 "r": "P86"）
+            fixed = re.sub(r'{\s*"h":\s*(\d+),\s*"t":\s*(\d+),\s*"([^"]+)":\s*"([^"]+)"\s*}',
+                          r'{"h": \1, "t": \2, "r": "\4"}', fixed)
+            
+            # 3. 确保是完整数组
+            if not fixed.startswith('['):
+                fixed = '[' + fixed
+            if not fixed.endswith(']'):
+                fixed += ']'
+                
+            # 4. 修复键名错误（如 "P86" 作为键）
+            fixed = re.sub(r'"([A-Z]\d+)":', r'"r": "\1", "raw_key": "\1"', fixed)
+            
+            return json.loads(fixed)
+            
+        except json.JSONDecodeError as e:
+            print(f"尝试修复失败（尝试 {_+1}/{max_retry}）: {str(e)}")
+            continue
+    
+
+    print("⚠️ 启用终极解析模式")
+    valid_entries = []
+    for line in json_str.splitlines():
+        if re.match(r'\s*{\s*"h":\s*\d+,\s*"t":\s*\d+.*}', line):
+            try:
+                entry = json.loads(line.replace(',...', '').replace('...', ''))
+                if "h" in entry and "t" in entry and ("r" in entry or any(k.startswith("P") for k in entry)):
+                    if "r" not in entry:
+                        for k in entry:
+                            if k.startswith("P"):
+                                entry["r"] = entry.pop(k)
+                                break
+                    valid_entries.append({"h": int(entry["h"]), "t": int(entry["t"]), "r": str(entry.get("r", ""))})
+            except:
+                continue
+    return valid_entries
+
+    print(f"🚨 最终JSON解析失败，原始输出:\n{json_str[:500]}...")  # 截断过长的输出
+    return []
+
+class Agent:
+    def __init__(self):
+        self.rel_map = self.load_relation_info("rel_info.json")
+        self.model = ZhipuModel()
+
+    def load_relation_info(self, path):
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+
+    def run_direct(self, user_message):
+        return self.model.chat("", user_message).strip()
+
+def compute_micro_f1(predictions, golds):
+    total_TP, total_FP, total_FN = 0, 0, 0
+    for pred_set, gold_set in zip(predictions, golds):
+        total_TP += len(pred_set & gold_set)
+        total_FP += len(pred_set - gold_set)
+        total_FN += len(gold_set - pred_set)
+    precision = total_TP / (total_TP + total_FP + 1e-10)
+    recall = total_TP / (total_TP + total_FN + 1e-10)
+    f1 = 2 * precision * recall / (precision + recall + 1e-10)
+    return precision, recall, f1
+
+def write_pred_to_file(filepath, pred_dict):
+    with open(filepath, "a", encoding="utf-8") as f:
+        f.write(json.dumps(pred_dict, ensure_ascii=False) + "\n")
+
+if __name__ == '__main__':
+    with open("test.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    agent = Agent()
+    predictions = []
+    golds = []
+
+    pred_file = "pred.json"
+    open(pred_file, "w", encoding="utf-8").close()
+    open("failed_preds.txt", "w", encoding="utf-8").close()
+
+    for idx, doc in enumerate(data):
+        print(f"\n\n======== Document {idx + 1}/{len(data)} ========")
+        try:
+            entity_names = []
+            name2idx = {}
+            for i, entity in enumerate(doc['vertexSet']):
+                name = entity[0].get('name', entity[0].get('word', f"Entity{i}"))
+                entity_names.append(f"{i}: {name}")
+                name2idx[name] = i
+
+            entity_name_hint = "Entity index to name mapping:\n" + "\n".join(entity_names)
+            relation_hint = "Available relation types:\n" + json.dumps(agent.rel_map, ensure_ascii=False, indent=2)
+            full_text = " ".join([" ".join(sent) for sent in doc['sents']])
+
+            user_message = f"""
+Please extract all semantic relations between entity pairs from the following DocRED document.
+
+Document title: {doc['title']}
+Document content: {full_text}
+
+Entity list:
+{json.dumps(doc['vertexSet'], ensure_ascii=False, indent=2)}
+
+{entity_name_hint}
+
+{relation_hint}
+
+⚠️ Only output the Final Answer in JSON array format:
+[
+  {{ "h": 0, "t": 1, "r": "P17" }},
+  ...
+]
+No explanation, no text, no comments — just valid JSON.
+Limit to 20 relations maximum.
+"""
+
+            result_str = agent.run_direct(user_message)
+            # print("\n=== Final Extraction Result ===")
+            # print(result_str)
+
+            pred = safe_load_json(result_str)
+            pred_set = set()
+            pred_labels = []
+
+            for triple in pred:
+                if isinstance(triple, dict) and all(k in triple for k in ["h", "t", "r"]):
+                    h_idx, t_idx, rel = triple["h"], triple["t"], triple["r"]
+                    pred_set.add((h_idx, t_idx, rel))
+                    pred_labels.append({"h": h_idx, "t": t_idx, "r": rel})
+
+            predictions.append(pred_set)
+            write_pred_to_file(pred_file, {
+                "title": doc.get("title", f"Doc_{idx}"),
+                "labels": pred_labels
+            })
+
+            if not pred_labels:
+                with open("failed_preds.txt", "a", encoding="utf-8") as flog:
+                    flog.write(f"{doc.get('title', f'Doc_{idx}')}\n")
+
+        except Exception as e:
+            print(f"⚠️ Skipping document {idx + 1} due to error: {e}")
+            predictions.append(set())
+            write_pred_to_file(pred_file, {
+                "title": doc.get("title", f"Doc_{idx}"),
+                "labels": []
+            })
+
+        # gold labels
+        gold = set()
+        for label in doc.get("labels", []):
+            h_idx, t_idx, rel = label["h"], label["t"], label["r"]
+            gold.add((h_idx, t_idx, rel))
+        golds.append(gold)
+
+    # Evaluate
+    precision, recall, f1 = compute_micro_f1(predictions, golds)
+    print("\n\n=== Overall Evaluation ===")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall:    {recall:.4f}")
+    print(f"F1 Score:  {f1:.4f}")
+    print(f"\n✅ All predictions saved to: {pred_file}")
 
